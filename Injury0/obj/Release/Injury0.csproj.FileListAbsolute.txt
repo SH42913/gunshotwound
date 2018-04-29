@@ -1,0 +1,16 @@
+C:\RiderProjects\Injury0\Injury0\bin\Release\GunshotWound.dll
+C:\RiderProjects\Injury0\Injury0\bin\Release\GunshotWound.pdb
+C:\RiderProjects\Injury0\Injury0\bin\Release\ScriptHookVDotNet2.dll
+C:\RiderProjects\Injury0\Injury0\bin\Release\ScriptHookVDotNet2.xml
+C:\RiderProjects\Injury0\Injury0\obj\Release\Injury0.csprojResolveAssemblyReference.cache
+C:\RiderProjects\Injury0\Injury0\obj\Release\Injury0.csproj.CoreCompileInputs.cache
+C:\RiderProjects\Injury0\Injury0\obj\Release\GunshotWound.dll
+C:\RiderProjects\Injury0\Injury0\obj\Release\GunshotWound.pdb
+C:\RiderProjects\GSW\Injury0\bin\Release\GunshotWound.dll
+C:\RiderProjects\GSW\Injury0\bin\Release\GunshotWound.pdb
+C:\RiderProjects\GSW\Injury0\bin\Release\ScriptHookVDotNet2.dll
+C:\RiderProjects\GSW\Injury0\bin\Release\ScriptHookVDotNet2.xml
+C:\RiderProjects\GSW\Injury0\obj\Release\Injury0.csprojResolveAssemblyReference.cache
+C:\RiderProjects\GSW\Injury0\obj\Release\Injury0.csproj.CoreCompileInputs.cache
+C:\RiderProjects\GSW\Injury0\obj\Release\GunshotWound.dll
+C:\RiderProjects\GSW\Injury0\obj\Release\GunshotWound.pdb
