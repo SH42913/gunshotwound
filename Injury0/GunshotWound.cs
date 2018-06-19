@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using GTA;
@@ -61,7 +62,8 @@ namespace GunshotWound
         HIGH_CALIBER,
         SHOTGUN,
         CUTTING,
-        IMPACT,
+        LIGHT_IMPACT,
+        HEAVY_IMPACT,
         EXPLOSIVE,
         FIRE,
         SUFFOCATING,
@@ -113,7 +115,7 @@ namespace GunshotWound
         /// <summary>
         /// Player is influenced by mod
         /// </summary>
-        public bool PlayerIsEnabled { get; private set; }
+        public bool WoundedPlayerEnabled { get; private set; }
 
         /// <summary>
         /// Enemy critical damage notifications enabled
@@ -327,39 +329,65 @@ namespace GunshotWound
 
         public static List<uint> SmallCaliberWeaponHashes = new List<uint>(new uint[]
         {
-            (uint) WeaponHash.Pistol, (uint) WeaponHash.CombatPistol, (uint) WeaponHash.APPistol,
+            (uint) WeaponHash.Pistol, 
+            (uint) WeaponHash.CombatPistol, 
+            (uint) WeaponHash.APPistol,
             (uint) WeaponHash.CombatPDW,
-            (uint) WeaponHash.MachinePistol, (uint) WeaponHash.MicroSMG, (uint) WeaponHash.MiniSMG,
+            (uint) WeaponHash.MachinePistol, 
+            (uint) WeaponHash.MicroSMG, 
+            (uint) WeaponHash.MiniSMG,
             (uint) WeaponHash.PistolMk2,
-            (uint) WeaponHash.SNSPistol, (uint) WeaponHash.SNSPistolMk2, (uint) WeaponHash.VintagePistol,
+            (uint) WeaponHash.SNSPistol, 
+            (uint) WeaponHash.SNSPistolMk2, 
+            (uint) WeaponHash.VintagePistol,
         });
 
         public static List<uint> MediumCaliberWeaponHashes = new List<uint>(new uint[]
         {
-            (uint) WeaponHash.AdvancedRifle, (uint) WeaponHash.AssaultSMG,
-            (uint) WeaponHash.BullpupRifle, (uint) WeaponHash.BullpupRifleMk2, (uint) WeaponHash.CarbineRifle,
+            (uint) WeaponHash.AdvancedRifle, 
+            (uint) WeaponHash.AssaultSMG,
+            (uint) WeaponHash.BullpupRifle, 
+            (uint) WeaponHash.BullpupRifleMk2, 
+            (uint) WeaponHash.CarbineRifle,
             (uint) WeaponHash.CarbineRifleMk2,
-            (uint) WeaponHash.CompactRifle, (uint) WeaponHash.DoubleActionRevolver, (uint) WeaponHash.Gusenberg,
+            (uint) WeaponHash.CompactRifle, 
+            (uint) WeaponHash.DoubleActionRevolver, 
+            (uint) WeaponHash.Gusenberg,
             (uint) WeaponHash.HeavyPistol,
-            (uint) WeaponHash.MarksmanPistol, (uint) WeaponHash.Pistol50, (uint) WeaponHash.Revolver,
+            (uint) WeaponHash.MarksmanPistol, 
+            (uint) WeaponHash.Pistol50, 
+            (uint) WeaponHash.Revolver,
             (uint) WeaponHash.RevolverMk2,
-            (uint) WeaponHash.SMG, (uint) WeaponHash.SMGMk2, (uint) WeaponHash.SpecialCarbine,
+            (uint) WeaponHash.SMG, 
+            (uint) WeaponHash.SMGMk2, 
+            (uint) WeaponHash.SpecialCarbine,
             (uint) WeaponHash.SpecialCarbineMk2,
         });
 
         public static List<uint> HighCaliberWeaponHashes = new List<uint>(new uint[]
         {
-            (uint) WeaponHash.AssaultRifle, (uint) WeaponHash.AssaultrifleMk2, (uint) WeaponHash.CombatMG,
-            (uint) WeaponHash.CombatMGMk2, (uint) WeaponHash.HeavySniper, (uint) WeaponHash.HeavySniperMk2,
-            (uint) WeaponHash.MarksmanRifle, (uint) WeaponHash.MarksmanRifleMk2, (uint) WeaponHash.MG,
+            (uint) WeaponHash.AssaultRifle, 
+            (uint) WeaponHash.AssaultrifleMk2, 
+            (uint) WeaponHash.CombatMG,
+            (uint) WeaponHash.CombatMGMk2, 
+            (uint) WeaponHash.HeavySniper, 
+            (uint) WeaponHash.HeavySniperMk2,
+            (uint) WeaponHash.MarksmanRifle, 
+            (uint) WeaponHash.MarksmanRifleMk2, 
+            (uint) WeaponHash.MG,
             (uint) WeaponHash.Minigun,
-            (uint) WeaponHash.Musket, (uint) WeaponHash.Railgun,
+            (uint) WeaponHash.Musket, 
+            (uint) WeaponHash.Railgun,
         });
 
         public static List<uint> ShotgunsWeaponHashes = new List<uint>(new uint[]
         {
-            (uint) WeaponHash.AssaultShotgun, (uint) WeaponHash.BullpupShotgun, (uint) WeaponHash.DoubleBarrelShotgun,
-            (uint) WeaponHash.HeavyShotgun, (uint) WeaponHash.PumpShotgun, (uint) WeaponHash.PumpShotgunMk2,
+            (uint) WeaponHash.AssaultShotgun, 
+            (uint) WeaponHash.BullpupShotgun, 
+            (uint) WeaponHash.DoubleBarrelShotgun,
+            (uint) WeaponHash.HeavyShotgun, 
+            (uint) WeaponHash.PumpShotgun,
+            (uint) WeaponHash.PumpShotgunMk2,
             (uint) WeaponHash.SawnOffShotgun,
             (uint) WeaponHash.SweeperShotgun,
         });
@@ -367,30 +395,55 @@ namespace GunshotWound
         public static List<uint> CuttingWeaponHashes = new List<uint>(new uint[]
         {
             //Animal    Cougar     BarbedWire
-            4194021054, 148160082, 1223143800, (uint) WeaponHash.BattleAxe, (uint) WeaponHash.Bottle,
+            4194021054, 148160082, 1223143800, 
+            (uint) WeaponHash.BattleAxe, 
+            (uint) WeaponHash.Bottle,
             (uint) WeaponHash.Dagger,
-            (uint) WeaponHash.Hatchet, (uint) WeaponHash.Knife, (uint) WeaponHash.Machete,
+            (uint) WeaponHash.Hatchet, 
+            (uint) WeaponHash.Knife, 
+            (uint) WeaponHash.Machete,
             (uint) WeaponHash.SwitchBlade,
         });
-
-        public static List<uint> ImpactWeaponHashes = new List<uint>(new uint[]
+        
+        public static List<uint> LightImpactWeaponHashes = new List<uint>(new uint[]
         {
             //GarbageBug Briefcase  Briefcase2
-            3794977420, 2294779575, 28811031, (uint) WeaponHash.Ball, (uint) WeaponHash.Bat,
+            3794977420, 2294779575, 28811031, 
+            (uint) WeaponHash.Ball, 
+            (uint) WeaponHash.Flashlight, 
+            (uint) WeaponHash.KnuckleDuster,
+            (uint) WeaponHash.Nightstick, 
+            (uint) WeaponHash.Snowball,
+            (uint) WeaponHash.Unarmed, 
+            (uint) WeaponHash.Parachute,
+            (uint) WeaponHash.NightVision,
+        });
+
+        public static List<uint> HeavyImpactWeaponHashes = new List<uint>(new uint[]
+        {
+            (uint) WeaponHash.Bat, 
             (uint) WeaponHash.Crowbar,
-            (uint) WeaponHash.FireExtinguisher, (uint) WeaponHash.Firework, (uint) WeaponHash.Flashlight,
-            (uint) WeaponHash.GolfClub, (uint) WeaponHash.Hammer, (uint) WeaponHash.KnuckleDuster,
-            (uint) WeaponHash.Nightstick, (uint) WeaponHash.NightVision, (uint) WeaponHash.Parachute,
-            (uint) WeaponHash.PetrolCan, (uint) WeaponHash.PoolCue, (uint) WeaponHash.Snowball,
-            (uint) WeaponHash.Unarmed, (uint) WeaponHash.Wrench,
+            (uint) WeaponHash.FireExtinguisher, 
+            (uint) WeaponHash.Firework,
+            (uint) WeaponHash.GolfClub, 
+            (uint) WeaponHash.Hammer, 
+            (uint) WeaponHash.PetrolCan, 
+            (uint) WeaponHash.PoolCue, 
+            (uint) WeaponHash.Wrench,
         });
 
         public static List<uint> ExplosiveWeaponHashes = new List<uint>(new uint[]
         {
             //Explosion
-            539292904, (uint) WeaponHash.Grenade, (uint) WeaponHash.CompactGrenadeLauncher,
-            (uint) WeaponHash.GrenadeLauncher, (uint) WeaponHash.HomingLauncher, (uint) WeaponHash.PipeBomb,
-            (uint) WeaponHash.ProximityMine, (uint) WeaponHash.RPG, (uint) WeaponHash.StickyBomb,
+            539292904, 
+            (uint) WeaponHash.Grenade, 
+            (uint) WeaponHash.CompactGrenadeLauncher,
+            (uint) WeaponHash.GrenadeLauncher, 
+            (uint) WeaponHash.HomingLauncher, 
+            (uint) WeaponHash.PipeBomb,
+            (uint) WeaponHash.ProximityMine, 
+            (uint) WeaponHash.RPG, 
+            (uint) WeaponHash.StickyBomb,
         });
 
         public static List<uint> OtherWeaponHashes = new List<uint>(new uint[]
@@ -402,14 +455,19 @@ namespace GunshotWound
         public static List<uint> FireWeaponHashes = new List<uint>(new uint[]
         {
             //ElectricFence Fire
-            2461879995, 3750660587, (uint) WeaponHash.StunGun, (uint) WeaponHash.Molotov, (uint) WeaponHash.Flare,
+            2461879995, 3750660587, 
+            (uint) WeaponHash.StunGun, 
+            (uint) WeaponHash.Molotov, 
+            (uint) WeaponHash.Flare,
             (uint) WeaponHash.FlareGun,
         });
 
         public static List<uint> SuffocatingWeaponHashes = new List<uint>(new uint[]
         {
             //Drowning  DrowningVeh Exhaust
-            4284007675, 1936677264, 910830060, (uint) WeaponHash.BZGas, (uint) WeaponHash.SmokeGrenade,
+            4284007675, 1936677264, 910830060, 
+            (uint) WeaponHash.BZGas, 
+            (uint) WeaponHash.SmokeGrenade,
             (uint) WeaponHash.GrenadeLauncherSmoke,
         });
 
@@ -434,7 +492,7 @@ namespace GunshotWound
         /// <summary>
         /// Debugneedstring
         /// </summary>
-        private string lastLoadedString;
+        private string _lastLoadedString;
 
         public GunshotWound()
         {
@@ -442,15 +500,15 @@ namespace GunshotWound
             {
                 LoadConfig();
                 
-                lastLoadedString = "Failed factory load";
+                _lastLoadedString = "Failed factory load";
                 LoadFactories();
 
                 Tick += OnTick;
                 KeyUp += OnKey;
 
-                if (PlayerIsEnabled)
+                if (WoundedPlayerEnabled)
                 {
-                    lastLoadedString = "Failed player init";
+                    _lastLoadedString = "Failed player init";
                     var config = new PedConfig
                     {
                         IsPlayer = true,
@@ -471,7 +529,7 @@ namespace GunshotWound
                 XDocument doc = new XDocument();
 
                 doc.Add(new XElement("Error",
-                    exception, new XAttribute("ErrorXmlString", lastLoadedString)));
+                    exception, new XAttribute("ErrorXmlString", _lastLoadedString)));
 
                 doc.Save("scripts/gswerror.xml");
                 UI.Notify("~r~GSW got error! Check Scripts folder and send to author file gswerror.xml. Thank you.");
@@ -495,87 +553,115 @@ namespace GunshotWound
             XDocument doc = XDocument.Load("scripts/GunshotWoundConfig.xml");
             XElement category = doc.Root.Element("General");
 
-            lastLoadedString = "WoundedPlayerEnabled";
-            PlayerIsEnabled = bool.Parse(category.Element("WoundedPlayerEnabled").Value);
-            lastLoadedString = "DamageModifier";
-            DamageModifier = float.Parse(category.Element("DamageModifier").Value);
+            _lastLoadedString = "WoundedPlayerEnabled";
+            WoundedPlayerEnabled = 
+                bool.Parse(category.Element("WoundedPlayerEnabled").Value);
+            _lastLoadedString = "DamageModifier";
+            DamageModifier = 
+                float.Parse(category.Element("DamageModifier").Value, CultureInfo.InvariantCulture);
 
-            lastLoadedString = "MaximalArmor";
-            MaxArmor = int.Parse(category.Element("MaximalArmor").Value);
-            lastLoadedString = "ArmorDamage";
-            ArmorDamage = int.Parse(category.Element("ArmorDamage").Value);
-            lastLoadedString = "MaximalHealth";
-            MaxHealth = int.Parse(category.Element("MaximalHealth").Value);
-            lastLoadedString = "SelfHealingAmount";
-            SelfHealingAmount = float.Parse(category.Element("SelfHealingAmount").Value);
-            lastLoadedString = "RefreshNotificatitonsTime";
-            TimeToRefreshNotifications = float.Parse(category.Element("RefreshNotificationsTime").Value);
+            _lastLoadedString = "MaximalArmor";
+            MaxArmor = 
+                int.Parse(category.Element("MaximalArmor").Value, CultureInfo.InvariantCulture);
+            _lastLoadedString = "ArmorDamage";
+            ArmorDamage = 
+                int.Parse(category.Element("ArmorDamage").Value, CultureInfo.InvariantCulture);
+            _lastLoadedString = "MaximalHealth";
+            MaxHealth = 
+                int.Parse(category.Element("MaximalHealth").Value, CultureInfo.InvariantCulture);
+            _lastLoadedString = "SelfHealingAmount";
+            SelfHealingAmount = 
+                float.Parse(category.Element("SelfHealingAmount").Value, CultureInfo.InvariantCulture);
+            _lastLoadedString = "RefreshNotificatitonsTime";
+            TimeToRefreshNotifications = 
+                float.Parse(category.Element("RefreshNotificationsTime").Value, CultureInfo.InvariantCulture);
 
-            lastLoadedString = "OtherPedsNotifications";
+            _lastLoadedString = "OtherPedsNotifications";
             EnemyNotificationsEnabled = bool.Parse(category.Element("OtherPedsNotifications").Value);
-            lastLoadedString = "SubtitlesStatus";
+            _lastLoadedString = "SubtitlesStatus";
             SubtitlesStatusEnabled = bool.Parse(category.Element("SubtitlesStatus").Value);
-            lastLoadedString = "DeadlyWoundSlowMotion";
+            _lastLoadedString = "DeadlyWoundSlowMotion";
             SlowMoOnDeadlyWound = bool.Parse(category.Element("DeadlyWoundSlowMotion").Value);
 
 
 
             category = doc.Root.Element("WoundedPeds");
-            lastLoadedString = "WoundedPedsEnabled";
-            WoundedPedsEnabled = bool.Parse(category.Element("WoundedPedsEnabled").Value);
-            lastLoadedString = "WorkingRadius";
-            SearchingRadius = float.Parse(category.Element("WorkingRadius").Value);
+            _lastLoadedString = "WoundedPedsEnabled";
+            WoundedPedsEnabled = 
+                bool.Parse(category.Element("WoundedPedsEnabled").Value);
+            _lastLoadedString = "WorkingRadius";
+            SearchingRadius = 
+                float.Parse(category.Element("WorkingRadius").Value, CultureInfo.InvariantCulture);
 
 
 
             category = doc.Root.Element("BleedingInjuries");
-            lastLoadedString = "TimeToBleed";
-            TimeToBleed = float.Parse(category.Element("TimeToBleed").Value);
+            _lastLoadedString = "TimeToBleed";
+            TimeToBleed = 
+                float.Parse(category.Element("TimeToBleed").Value, CultureInfo.InvariantCulture);
 
-            lastLoadedString = "LightBleedingDamage";
-            LightBleedingDamage = int.Parse(category.Element("LightBleedingDamage").Value);
-            lastLoadedString = "MediumBleedingDamage";
-            MediumBleedingDamage = int.Parse(category.Element("MediumBleedingDamage").Value);
-            lastLoadedString = "HeavyBleedingDamage";
-            HeavyBleedingDamage = int.Parse(category.Element("HeavyBleedingDamage").Value);
-            lastLoadedString = "DeadlyBleedingDamage";
-            DeadlyBleedingDamage = int.Parse(category.Element("DeadlyBleedingDamage").Value);
+            _lastLoadedString = "LightBleedingDamage";
+            LightBleedingDamage = 
+                int.Parse(category.Element("LightBleedingDamage").Value);
+            _lastLoadedString = "MediumBleedingDamage";
+            MediumBleedingDamage = 
+                int.Parse(category.Element("MediumBleedingDamage").Value);
+            _lastLoadedString = "HeavyBleedingDamage";
+            HeavyBleedingDamage = 
+                int.Parse(category.Element("HeavyBleedingDamage").Value);
+            _lastLoadedString = "DeadlyBleedingDamage";
+            DeadlyBleedingDamage = 
+                int.Parse(category.Element("DeadlyBleedingDamage").Value);
 
-            lastLoadedString = "MaxBleedingLevel";
-            MaxBleedingLevel = int.Parse(category.Element("MaxBleedingLevel").Value);
-            lastLoadedString = "HealBleedingTime";
-            TimeToHealBleeding = float.Parse(category.Element("HealBleedingTime").Value);
+            _lastLoadedString = "MaxBleedingLevel";
+            MaxBleedingLevel = 
+                int.Parse(category.Element("MaxBleedingLevel").Value, CultureInfo.InvariantCulture);
+            _lastLoadedString = "HealBleedingTime";
+            TimeToHealBleeding = 
+                float.Parse(category.Element("HealBleedingTime").Value, CultureInfo.InvariantCulture);
 
 
 
             category = doc.Root.Element("Wounds");
-            lastLoadedString = "TimeToDeath";
-            TimeToDeath = float.Parse(category.Element("TimeToDeath").Value);
+            _lastLoadedString = "TimeToDeath";
+            TimeToDeath = 
+                float.Parse(category.Element("TimeToDeath").Value, CultureInfo.InvariantCulture);
 
-            lastLoadedString = "AdditionalDamageLightWound";
-            AdditionalDamageOnLightWounds = int.Parse(category.Element("AdditionalDamageLightWound").Value);
-            lastLoadedString = "AdditionalDamageMediumWound";
-            AdditionalDamageOnMediumWounds = int.Parse(category.Element("AdditionalDamageMediumWound").Value);
-            lastLoadedString = "AdditionalDamageHeavyWound";
-            AdditionalDamageOnHeavyWounds = int.Parse(category.Element("AdditionalDamageHeavyWound").Value);
-            lastLoadedString = "AdditionalDamageDeadlyWound";
-            AdditionalDamageOnDeadlyWounds = int.Parse(category.Element("AdditionalDamageDeadlyWound").Value);
+            _lastLoadedString = "AdditionalDamageLightWound";
+            AdditionalDamageOnLightWounds = 
+                int.Parse(category.Element("AdditionalDamageLightWound").Value, CultureInfo.InvariantCulture);
+            _lastLoadedString = "AdditionalDamageMediumWound";
+            AdditionalDamageOnMediumWounds = 
+                int.Parse(category.Element("AdditionalDamageMediumWound").Value, CultureInfo.InvariantCulture);
+            _lastLoadedString = "AdditionalDamageHeavyWound";
+            AdditionalDamageOnHeavyWounds = 
+                int.Parse(category.Element("AdditionalDamageHeavyWound").Value, CultureInfo.InvariantCulture);
+            _lastLoadedString = "AdditionalDamageDeadlyWound";
+            AdditionalDamageOnDeadlyWounds = 
+                int.Parse(category.Element("AdditionalDamageDeadlyWound").Value, CultureInfo.InvariantCulture);
 
-            lastLoadedString = "AdditionalDamageNervesDamage";
-            AdditionalDamageOnNervesDamage = int.Parse(category.Element("AdditionalDamageNervesDamage").Value);
-            lastLoadedString = "AdditionalDamageHeadshot";
-            AdditionalHeadshotDamage = int.Parse(category.Element("AdditionalDamageHeadshot").Value);
+            _lastLoadedString = "AdditionalDamageNervesDamage";
+            AdditionalDamageOnNervesDamage = 
+                int.Parse(category.Element("AdditionalDamageNervesDamage").Value, CultureInfo.InvariantCulture);
+            _lastLoadedString = "AdditionalDamageHeadshot";
+            AdditionalHeadshotDamage = 
+                int.Parse(category.Element("AdditionalDamageHeadshot").Value, CultureInfo.InvariantCulture);
 
-            lastLoadedString = "MoveRateLightWound";
-            MoveRateOnLightWounds = float.Parse(category.Element("MoveRateLightWound").Value);
-            lastLoadedString = "MoveRateMediumWound";
-            MoveRateOnMediumWounds = float.Parse(category.Element("MoveRateMediumWound").Value);
-            lastLoadedString = "MoveRateHeavyWound";
-            MoveRateOnHeavyWounds = float.Parse(category.Element("MoveRateHeavyWound").Value);
-            lastLoadedString = "MoveRateDeadlyWound";
-            MoveRateOnDeadlyWounds = float.Parse(category.Element("MoveRateDeadlyWound").Value);
-            lastLoadedString = "MoveRateNervesLegsDamage";
-            MoveRateOnNervesDamage = float.Parse(category.Element("MoveRateNervesLegsDamage").Value);
+            _lastLoadedString = "MoveRateLightWound";
+            MoveRateOnLightWounds = 
+                float.Parse(category.Element("MoveRateLightWound").Value, CultureInfo.InvariantCulture);
+            _lastLoadedString = "MoveRateMediumWound";
+            MoveRateOnMediumWounds = 
+                float.Parse(category.Element("MoveRateMediumWound").Value, CultureInfo.InvariantCulture);
+            _lastLoadedString = "MoveRateHeavyWound";
+            MoveRateOnHeavyWounds = 
+                float.Parse(category.Element("MoveRateHeavyWound").Value, CultureInfo.InvariantCulture);
+            _lastLoadedString = "MoveRateDeadlyWound";
+            MoveRateOnDeadlyWounds = 
+                float.Parse(category.Element("MoveRateDeadlyWound").Value, CultureInfo.InvariantCulture);
+            _lastLoadedString = "MoveRateNervesLegsDamage";
+            MoveRateOnNervesDamage = 
+                float.Parse(category.Element("MoveRateNervesLegsDamage").Value, CultureInfo.InvariantCulture);
 
             AnimationOnNoneWounds = category.Element("AnimationNoneWound").Value;
             AnimationOnLightWounds = category.Element("AnimationLightWound").Value;
@@ -584,24 +670,26 @@ namespace GunshotWound
             AnimationOnDeadlyWounds = category.Element("AnimationDeadlyWound").Value;
             AnimationOnNervesDamage = category.Element("AnimationNervesLegsDamage").Value;
 
-            lastLoadedString = "MaxWoundLevel";
-            MaxWoundLevel = int.Parse(category.Element("MaxWoundLevel").Value);
-            lastLoadedString = "HealWoundTime";
-            TimeToHealWounds = float.Parse(category.Element("HealWoundTime").Value);
+            _lastLoadedString = "MaxWoundLevel";
+            MaxWoundLevel = 
+                int.Parse(category.Element("MaxWoundLevel").Value, CultureInfo.InvariantCulture);
+            _lastLoadedString = "HealWoundTime";
+            TimeToHealWounds = 
+                float.Parse(category.Element("HealWoundTime").Value, CultureInfo.InvariantCulture);
 
 
 
             category = doc.Root.Element("Hotkeys");
-            lastLoadedString = "HealKey";
+            _lastLoadedString = "HealKey";
             HealButton = (Keys) Enum.Parse(typeof(Keys), category.Element("HealKey").Value);
 
-            lastLoadedString = "SubtitlesKey";
+            _lastLoadedString = "SubtitlesKey";
             SubtitlesButton = (Keys) Enum.Parse(typeof(Keys), category.Element("SubtitlesKey").Value);
 
-            lastLoadedString = "NotificationsKey";
+            _lastLoadedString = "NotificationsKey";
             NotificationsButton = (Keys) Enum.Parse(typeof(Keys), category.Element("NotificationsKey").Value);
 
-            lastLoadedString = "GetHelmetKey";
+            _lastLoadedString = "GetHelmetKey";
             HelmetButton = (Keys) Enum.Parse(typeof(Keys), category.Element("GetHelmetKey").Value);
         }
 
@@ -686,6 +774,7 @@ namespace GunshotWound
                     UI.Notify("You're using ~r~GunShot Wound~s~\nby ~g~SH42913~s~. Thank you!~WS~");
                     if (DebugMode)
                     {
+                        UI.Notify($"Wounded Player: {WoundedPlayerEnabled}");
                         UI.Notify($"Wounded Peds: {WoundedPedsEnabled}");
                     }
                     if (FoolsDay)
@@ -694,7 +783,7 @@ namespace GunshotWound
                     }
                 }
 
-                if (PlayerIsEnabled)
+                if (WoundedPlayerEnabled)
                 {
                     string subtitlesStatus = "";
                     foreach (IEnhancedPed ped in PlayerList)
@@ -749,7 +838,9 @@ namespace GunshotWound
                     exception));
 
                 doc.Save("scripts/gswerror.xml");
-                UI.Notify("~r~GSW got error! Check Scripts folder and send to author file gswerror.xml. Thank you.");
+                UI.Notify("~r~GSW got error! " +
+                          "Check Scripts folder and send to author file gswerror.xml. " +
+                          "Thank you.");
             }
         }
 
@@ -792,7 +883,7 @@ namespace GunshotWound
         /// <param name="target">Target ped</param>
         /// <param name="debug">Debug notifications</param>
         /// <returns>Damaged body part</returns>
-        public static unsafe BodyParts GetDamagedBodyPart(Ped target, bool debug)
+        public static unsafe BodyParts GetDamagedBodyPart(Ped target, bool debug = false)
         {
             int damagedBoneNum = 0;
             int* x = &damagedBoneNum;
@@ -804,284 +895,54 @@ namespace GunshotWound
                 if (debug)
                     UI.Notify($"It was {damagedBone}");
 
-                if (damagedBone == Bone.SKEL_Head)
+                switch (damagedBone)
                 {
-                    Function.Call(Hash.CLEAR_PED_LAST_DAMAGE_BONE, target);
-                    if (debug)
-                        UI.Notify($"You got {BodyParts.HEAD}");
-                    return BodyParts.HEAD;
-                }
-                else if (damagedBone == Bone.SKEL_Neck_1)
-                {
-                    Function.Call(Hash.CLEAR_PED_LAST_DAMAGE_BONE, target);
-                    if (debug)
-                        UI.Notify($"You got {BodyParts.NECK}");
-                    return BodyParts.NECK;
-                }
-                else if (damagedBone == Bone.SKEL_Spine2 || damagedBone == Bone.SKEL_Spine3)
-                {
-                    Function.Call(Hash.CLEAR_PED_LAST_DAMAGE_BONE, target);
-                    if (debug)
-                        UI.Notify($"You got {BodyParts.UPPER_BODY}");
-                    return BodyParts.UPPER_BODY;
-                }
-                else if (damagedBone == Bone.SKEL_Pelvis || damagedBone == Bone.SKEL_Spine_Root ||
-                         damagedBone == Bone.SKEL_Spine0 || damagedBone == Bone.SKEL_Spine1 ||
-                         damagedBone == Bone.SKEL_ROOT)
-                {
-                    Function.Call(Hash.CLEAR_PED_LAST_DAMAGE_BONE, target);
-                    if (debug)
-                        UI.Notify($"You got {BodyParts.LOWER_BODY}");
-                    return BodyParts.LOWER_BODY;
-                }
-                else if (damagedBone == Bone.SKEL_L_Thigh || damagedBone == Bone.SKEL_R_Thigh ||
-                         damagedBone == Bone.SKEL_L_Toe0 || damagedBone == Bone.SKEL_R_Toe0 ||
-                         damagedBone == Bone.SKEL_R_Foot || damagedBone == Bone.SKEL_L_Foot ||
-                         damagedBone == Bone.SKEL_L_Calf || damagedBone == Bone.SKEL_R_Calf)
-                {
-                    Function.Call(Hash.CLEAR_PED_LAST_DAMAGE_BONE, target);
-                    if (debug)
-                        UI.Notify($"You got {BodyParts.LEG}");
-                    return BodyParts.LEG;
-                }
-                else if (damagedBone == Bone.SKEL_L_Clavicle || damagedBone == Bone.SKEL_R_Clavicle ||
-                         damagedBone == Bone.SKEL_L_Forearm || damagedBone == Bone.SKEL_R_Forearm ||
-                         damagedBone == Bone.SKEL_L_Hand || damagedBone == Bone.SKEL_R_Hand)
-                {
-                    Function.Call(Hash.CLEAR_PED_LAST_DAMAGE_BONE, target);
-                    if (debug)
-                        UI.Notify($"You got {BodyParts.ARM}");
-                    return BodyParts.ARM;
+                    case Bone.SKEL_Head:
+                        Function.Call(Hash.CLEAR_PED_LAST_DAMAGE_BONE, target);
+                        if (debug) UI.Notify($"You got {BodyParts.HEAD}");
+                        return BodyParts.HEAD;
+                    case Bone.SKEL_Neck_1:
+                        Function.Call(Hash.CLEAR_PED_LAST_DAMAGE_BONE, target);
+                        if (debug) UI.Notify($"You got {BodyParts.NECK}");
+                        return BodyParts.NECK;
+                    case Bone.SKEL_Spine2:
+                    case Bone.SKEL_Spine3:
+                        Function.Call(Hash.CLEAR_PED_LAST_DAMAGE_BONE, target);
+                        if (debug) UI.Notify($"You got {BodyParts.UPPER_BODY}");
+                        return BodyParts.UPPER_BODY;
+                    case Bone.SKEL_Pelvis:
+                    case Bone.SKEL_Spine_Root:
+                    case Bone.SKEL_Spine0:
+                    case Bone.SKEL_Spine1:
+                    case Bone.SKEL_ROOT:
+                        Function.Call(Hash.CLEAR_PED_LAST_DAMAGE_BONE, target);
+                        if (debug) UI.Notify($"You got {BodyParts.LOWER_BODY}");
+                        return BodyParts.LOWER_BODY;
+                    case Bone.SKEL_L_Thigh:
+                    case Bone.SKEL_R_Thigh:
+                    case Bone.SKEL_L_Toe0:
+                    case Bone.SKEL_R_Toe0:
+                    case Bone.SKEL_R_Foot:
+                    case Bone.SKEL_L_Foot:
+                    case Bone.SKEL_L_Calf:
+                    case Bone.SKEL_R_Calf:
+                        Function.Call(Hash.CLEAR_PED_LAST_DAMAGE_BONE, target);
+                        if (debug) UI.Notify($"You got {BodyParts.LEG}");
+                        return BodyParts.LEG;
+                    case Bone.SKEL_L_Clavicle:
+                    case Bone.SKEL_R_Clavicle:
+                    case Bone.SKEL_L_Forearm:
+                    case Bone.SKEL_R_Forearm:
+                    case Bone.SKEL_L_Hand:
+                    case Bone.SKEL_R_Hand:
+                        Function.Call(Hash.CLEAR_PED_LAST_DAMAGE_BONE, target);
+                        if (debug) UI.Notify($"You got {BodyParts.ARM}");
+                        return BodyParts.ARM;
                 }
             }
 
             Function.Call(Hash.CLEAR_PED_LAST_DAMAGE_BONE, target);
             return BodyParts.NOTHING;
-        }
-
-        /// <summary>
-        /// With this method you can get which body-part was damaged
-        /// </summary>
-        /// <param name="target">Target ped</param>
-        /// <returns>Damaged body part</returns>
-        public unsafe BodyParts GetDamagedBodyPart(Ped target)
-        {
-            int damagedBoneNum = 0;
-            int* x = &damagedBoneNum;
-            Function.Call(Hash.GET_PED_LAST_DAMAGE_BONE, target, x);
-
-            if (damagedBoneNum != 0)
-            {
-                Enum.TryParse(damagedBoneNum.ToString(), out Bone damagedBone);
-                if (DebugMode)
-                    UI.Notify($"It was {damagedBone}");
-
-                if (damagedBone == Bone.SKEL_Head)
-                {
-                    Function.Call(Hash.CLEAR_PED_LAST_DAMAGE_BONE, target);
-                    if (DebugMode)
-                        UI.Notify($"You got {BodyParts.HEAD}");
-                    return BodyParts.HEAD;
-                }
-                else if (damagedBone == Bone.SKEL_Neck_1)
-                {
-                    Function.Call(Hash.CLEAR_PED_LAST_DAMAGE_BONE, target);
-                    if (DebugMode)
-                        UI.Notify($"You got {BodyParts.NECK}");
-                    return BodyParts.NECK;
-                }
-                else if (damagedBone == Bone.SKEL_Spine2 || damagedBone == Bone.SKEL_Spine3)
-                {
-                    Function.Call(Hash.CLEAR_PED_LAST_DAMAGE_BONE, target);
-                    if (DebugMode)
-                        UI.Notify($"You got {BodyParts.UPPER_BODY}");
-                    return BodyParts.UPPER_BODY;
-                }
-                else if (damagedBone == Bone.SKEL_Pelvis || damagedBone == Bone.SKEL_Spine_Root ||
-                         damagedBone == Bone.SKEL_Spine0 || damagedBone == Bone.SKEL_Spine1 ||
-                         damagedBone == Bone.SKEL_ROOT)
-                {
-                    Function.Call(Hash.CLEAR_PED_LAST_DAMAGE_BONE, target);
-                    if (DebugMode)
-                        UI.Notify($"You got {BodyParts.LOWER_BODY}");
-                    return BodyParts.LOWER_BODY;
-                }
-                else if (damagedBone == Bone.SKEL_L_Thigh || damagedBone == Bone.SKEL_R_Thigh ||
-                         damagedBone == Bone.SKEL_L_Toe0 || damagedBone == Bone.SKEL_R_Toe0 ||
-                         damagedBone == Bone.SKEL_R_Foot || damagedBone == Bone.SKEL_L_Foot ||
-                         damagedBone == Bone.SKEL_L_Calf || damagedBone == Bone.SKEL_R_Calf)
-                {
-                    Function.Call(Hash.CLEAR_PED_LAST_DAMAGE_BONE, target);
-                    if (DebugMode)
-                        UI.Notify($"You got {BodyParts.LEG}");
-                    return BodyParts.LEG;
-                }
-                else if (damagedBone == Bone.SKEL_L_Clavicle || damagedBone == Bone.SKEL_R_Clavicle ||
-                         damagedBone == Bone.SKEL_L_Forearm || damagedBone == Bone.SKEL_R_Forearm ||
-                         damagedBone == Bone.SKEL_L_Hand || damagedBone == Bone.SKEL_R_Hand)
-                {
-                    Function.Call(Hash.CLEAR_PED_LAST_DAMAGE_BONE, target);
-                    if (DebugMode)
-                        UI.Notify($"You got {BodyParts.ARM}");
-                    return BodyParts.ARM;
-                }
-            }
-
-            Function.Call(Hash.CLEAR_PED_LAST_DAMAGE_BONE, target);
-            return BodyParts.NOTHING;
-        }
-
-        /// <summary>
-        /// With this method you can get which weapon class damage ped
-        /// </summary>
-        /// <param name="target">Target ped</param>
-        /// <returns>Weapon class</returns>
-        public WeaponClasses GetDamagedWeaponClass(Ped target)
-        {
-            /*if (!Function.Call<bool>(Hash.HAS_PED_BEEN_DAMAGED_BY_WEAPON, target, 0, 2))
-                return WeaponClasses.NOTHING;*/
-
-            foreach (uint hash in OtherWeaponHashes)
-            {
-                if (!Function.Call<bool>(Hash.HAS_PED_BEEN_DAMAGED_BY_WEAPON, target, hash, 0)) continue;
-                
-                if (DebugMode)
-                {
-                    Enum.TryParse(hash.ToString(), out WeaponHash hitBy);
-                    UI.Notify("Hit by " + hitBy);
-                    UI.Notify($"You got {WeaponClasses.OTHER}");
-                }
-                
-                return WeaponClasses.OTHER;
-            }
-
-            foreach (uint hash in SmallCaliberWeaponHashes)
-            {
-                if (!Function.Call<bool>(Hash.HAS_PED_BEEN_DAMAGED_BY_WEAPON, target, hash, 0)) continue;
-                
-                if (DebugMode)
-                {
-                    Enum.TryParse(hash.ToString(), out WeaponHash hitBy);
-                    UI.Notify("Hit by " + hitBy);
-                    UI.Notify($"You got {WeaponClasses.SMALL_CALIBER}");
-                }
-
-                return WeaponClasses.SMALL_CALIBER;
-            }
-
-            foreach (uint hash in MediumCaliberWeaponHashes)
-            {
-                if (!Function.Call<bool>(Hash.HAS_PED_BEEN_DAMAGED_BY_WEAPON, target, hash, 0)) continue;
-                
-                if (DebugMode)
-                {
-                    Enum.TryParse(hash.ToString(), out WeaponHash hitBy);
-                    UI.Notify("Hit by " + hitBy);
-                    UI.Notify($"You got {WeaponClasses.MEDIUM_CALIBER}");
-                }
-
-                return WeaponClasses.MEDIUM_CALIBER;
-            }
-
-            foreach (uint hash in HighCaliberWeaponHashes)
-            {
-                if (!Function.Call<bool>(Hash.HAS_PED_BEEN_DAMAGED_BY_WEAPON, target, hash, 0)) continue;
-                
-                if (DebugMode)
-                {
-                    Enum.TryParse(hash.ToString(), out WeaponHash hitBy);
-                    UI.Notify("Hit by " + hitBy);
-                    UI.Notify($"You got {WeaponClasses.HIGH_CALIBER}");
-                }
-
-                return WeaponClasses.HIGH_CALIBER;
-            }
-
-            foreach (uint hash in ShotgunsWeaponHashes)
-            {
-                if (!Function.Call<bool>(Hash.HAS_PED_BEEN_DAMAGED_BY_WEAPON, target, hash, 0)) continue;
-                
-                if (DebugMode)
-                {
-                    Enum.TryParse(hash.ToString(), out WeaponHash hitBy);
-                    UI.Notify("Hit by " + hitBy);
-                    UI.Notify($"You got {WeaponClasses.SHOTGUN}");
-                }
-
-                return WeaponClasses.SHOTGUN;
-            }
-
-            foreach (uint hash in CuttingWeaponHashes)
-            {
-                if (!Function.Call<bool>(Hash.HAS_PED_BEEN_DAMAGED_BY_WEAPON, target, hash, 0)) continue;
-                
-                if (DebugMode)
-                {
-                    Enum.TryParse(hash.ToString(), out WeaponHash hitBy);
-                    UI.Notify("Hit by " + hitBy);
-                    UI.Notify($"You got {WeaponClasses.CUTTING}");
-                }
-
-                return WeaponClasses.CUTTING;
-            }
-
-            foreach (uint hash in ImpactWeaponHashes)
-            {
-                if (!Function.Call<bool>(Hash.HAS_PED_BEEN_DAMAGED_BY_WEAPON, target, hash, 0)) continue;
-                
-                if (DebugMode)
-                {
-                    Enum.TryParse(hash.ToString(), out WeaponHash hitBy);
-                    UI.Notify("Hit by " + hitBy);
-                    UI.Notify($"You got {WeaponClasses.IMPACT}");
-                }
-
-                return WeaponClasses.IMPACT;
-            }
-
-            foreach (uint hash in ExplosiveWeaponHashes)
-            {
-                if (!Function.Call<bool>(Hash.HAS_PED_BEEN_DAMAGED_BY_WEAPON, target, hash, 0)) continue;
-                
-                if (DebugMode)
-                {
-                    Enum.TryParse(hash.ToString(), out WeaponHash hitBy);
-                    UI.Notify("Hit by " + hitBy);
-                    UI.Notify($"You got {WeaponClasses.EXPLOSIVE}");
-                }
-
-                return WeaponClasses.EXPLOSIVE;
-            }
-
-            foreach (uint hash in FireWeaponHashes)
-            {
-                if (!Function.Call<bool>(Hash.HAS_PED_BEEN_DAMAGED_BY_WEAPON, target, hash, 0)) continue;
-                
-                if (DebugMode)
-                {
-                    Enum.TryParse(hash.ToString(), out WeaponHash hitBy);
-                    UI.Notify("Hit by " + hitBy);
-                    UI.Notify($"You got {WeaponClasses.FIRE}");
-                }
-
-                return WeaponClasses.FIRE;
-            }
-
-            foreach (uint hash in SuffocatingWeaponHashes)
-            {
-                if (!Function.Call<bool>(Hash.HAS_PED_BEEN_DAMAGED_BY_WEAPON, target, hash, 0)) continue;
-                
-                if (DebugMode)
-                {
-                    Enum.TryParse(hash.ToString(), out WeaponHash hitBy);
-                    UI.Notify("Hit by " + hitBy);
-                    UI.Notify($"You got {WeaponClasses.SUFFOCATING}");
-                }
-
-                return WeaponClasses.SUFFOCATING;
-            }
-
-            return WeaponClasses.NOTHING;
         }
 
         /// <summary>
@@ -1090,138 +951,72 @@ namespace GunshotWound
         /// <param name="target">Target ped</param>
         /// <param name="debug">Debug notifications</param>
         /// <returns>Weapon class</returns>
-        public static WeaponClasses GetDamagedWeaponClass(Ped target, bool debug)
+        public static WeaponClasses GetDamagedWeaponClass(Ped target, bool debug = false)
         {
             /*if (!Function.Call<bool>(Hash.HAS_PED_BEEN_DAMAGED_BY_WEAPON, target, 0, 2))
                 return WeaponClasses.NOTHING;*/
 
-            foreach (uint hash in OtherWeaponHashes)
+            if (PedWasDamaged(OtherWeaponHashes, target, debug))
             {
-                if (!Function.Call<bool>(Hash.HAS_PED_BEEN_DAMAGED_BY_WEAPON, target, hash, 0)) continue;
-                
-                if (debug)
-                {
-                    Enum.TryParse(hash.ToString(), out WeaponHash hitBy);
-                    UI.Notify("Hit by " + hitBy);
-                    UI.Notify($"You got {WeaponClasses.OTHER}");
-                }
-
                 return WeaponClasses.OTHER;
             }
 
-            foreach (uint hash in SmallCaliberWeaponHashes)
+            if (PedWasDamaged(SmallCaliberWeaponHashes, target, debug))
             {
-                if (!Function.Call<bool>(Hash.HAS_PED_BEEN_DAMAGED_BY_WEAPON, target, hash, 0)) continue;
-                
-                if (debug)
-                {
-                    Enum.TryParse(hash.ToString(), out WeaponHash hitBy);
-                    UI.Notify("Hit by " + hitBy);
-                    UI.Notify($"You got {WeaponClasses.SMALL_CALIBER}");
-                }
-
                 return WeaponClasses.SMALL_CALIBER;
             }
 
-            foreach (uint hash in MediumCaliberWeaponHashes)
+            if (PedWasDamaged(MediumCaliberWeaponHashes, target, debug))
             {
-                if (!Function.Call<bool>(Hash.HAS_PED_BEEN_DAMAGED_BY_WEAPON, target, hash, 0)) continue;
-                
-                if (debug)
-                {
-                    Enum.TryParse(hash.ToString(), out WeaponHash hitBy);
-                    UI.Notify("Hit by " + hitBy);
-                    UI.Notify($"You got {WeaponClasses.MEDIUM_CALIBER}");
-                }
-
                 return WeaponClasses.MEDIUM_CALIBER;
             }
 
-            foreach (uint hash in HighCaliberWeaponHashes)
+            if (PedWasDamaged(HighCaliberWeaponHashes, target, debug))
             {
-                if (!Function.Call<bool>(Hash.HAS_PED_BEEN_DAMAGED_BY_WEAPON, target, hash, 0)) continue;
-                
-                if (debug)
-                {
-                    Enum.TryParse(hash.ToString(), out WeaponHash hitBy);
-                    UI.Notify("Hit by " + hitBy);
-                    UI.Notify($"You got {WeaponClasses.HIGH_CALIBER}");
-                }
-
                 return WeaponClasses.HIGH_CALIBER;
             }
 
-            foreach (uint hash in ShotgunsWeaponHashes)
+            if (PedWasDamaged(ShotgunsWeaponHashes, target, debug))
             {
-                if (!Function.Call<bool>(Hash.HAS_PED_BEEN_DAMAGED_BY_WEAPON, target, hash, 0)) continue;
-                
-                if (debug)
-                {
-                    Enum.TryParse(hash.ToString(), out WeaponHash hitBy);
-                    UI.Notify("Hit by " + hitBy);
-                    UI.Notify($"You got {WeaponClasses.SHOTGUN}");
-                }
-
                 return WeaponClasses.SHOTGUN;
             }
 
-            foreach (uint hash in CuttingWeaponHashes)
+            if (PedWasDamaged(CuttingWeaponHashes, target, debug))
             {
-                if (!Function.Call<bool>(Hash.HAS_PED_BEEN_DAMAGED_BY_WEAPON, target, hash, 0)) continue;
-                
-                if (debug)
-                {
-                    Enum.TryParse(hash.ToString(), out WeaponHash hitBy);
-                    UI.Notify("Hit by " + hitBy);
-                    UI.Notify($"You got {WeaponClasses.CUTTING}");
-                }
-
                 return WeaponClasses.CUTTING;
             }
-
-            foreach (uint hash in ImpactWeaponHashes)
+            
+            if (PedWasDamaged(LightImpactWeaponHashes, target, debug))
             {
-                if (!Function.Call<bool>(Hash.HAS_PED_BEEN_DAMAGED_BY_WEAPON, target, hash, 0)) continue;
-                
-                if (debug)
-                {
-                    Enum.TryParse(hash.ToString(), out WeaponHash hitBy);
-                    UI.Notify("Hit by " + hitBy);
-                    UI.Notify($"You got {WeaponClasses.IMPACT}");
-                }
-
-                return WeaponClasses.IMPACT;
+                return WeaponClasses.LIGHT_IMPACT;
             }
 
-            foreach (uint hash in ExplosiveWeaponHashes)
+            if (PedWasDamaged(HeavyImpactWeaponHashes, target, debug))
             {
-                if (!Function.Call<bool>(Hash.HAS_PED_BEEN_DAMAGED_BY_WEAPON, target, hash, 0)) continue;
-                
-                if (debug)
-                {
-                    Enum.TryParse(hash.ToString(), out WeaponHash hitBy);
-                    UI.Notify("Hit by " + hitBy);
-                    UI.Notify($"You got {WeaponClasses.EXPLOSIVE}");
-                }
+                return WeaponClasses.HEAVY_IMPACT;
+            }
 
+            if (PedWasDamaged(ExplosiveWeaponHashes, target, debug))
+            {
                 return WeaponClasses.EXPLOSIVE;
             }
 
-            foreach (uint hash in FireWeaponHashes)
+            if (PedWasDamaged(FireWeaponHashes, target, debug))
             {
-                if (!Function.Call<bool>(Hash.HAS_PED_BEEN_DAMAGED_BY_WEAPON, target, hash, 0)) continue;
-                
-                if (debug)
-                {
-                    Enum.TryParse(hash.ToString(), out WeaponHash hitBy);
-                    UI.Notify("Hit by " + hitBy);
-                    UI.Notify($"You got {WeaponClasses.FIRE}");
-                }
-
                 return WeaponClasses.FIRE;
             }
 
-            foreach (uint hash in SuffocatingWeaponHashes)
+            if (PedWasDamaged(SuffocatingWeaponHashes, target, debug))
+            {
+                return WeaponClasses.SUFFOCATING;
+            }
+
+            return WeaponClasses.NOTHING;
+        }
+
+        private static bool PedWasDamaged(IEnumerable<uint> hashes, Ped target, bool debug = false)
+        {
+            foreach (uint hash in hashes)
             {
                 if (!Function.Call<bool>(Hash.HAS_PED_BEEN_DAMAGED_BY_WEAPON, target, hash, 0)) continue;
                 
@@ -1232,17 +1027,25 @@ namespace GunshotWound
                     UI.Notify($"You got {WeaponClasses.SUFFOCATING}");
                 }
 
-                return WeaponClasses.SUFFOCATING;
+                return true;
             }
 
-            return WeaponClasses.NOTHING;
+            return false;
         }
         
         public static float DistanceToPlayer(Ped target)
         {
             return World.GetDistance(Game.Player.Character.Position, target.Position);
         }
-    } 
+    }
+
+    public static class RandomExtensions
+    {
+        public static bool TrueWithChance(this Random random, float chance = 0.5f)
+        {
+            return random.NextDouble() >= chance;
+        }
+    }
 }
 
     

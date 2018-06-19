@@ -13,3 +13,11 @@ C:\RiderProjects\GSW\Injury0\obj\Debug\Injury0.csprojResolveAssemblyReference.ca
 C:\RiderProjects\GSW\Injury0\obj\Debug\Injury0.csproj.CoreCompileInputs.cache
 C:\RiderProjects\GSW\Injury0\obj\Debug\GunshotWound.dll
 C:\RiderProjects\GSW\Injury0\obj\Debug\GunshotWound.pdb
+C:\RiderProjects\gunshotwound\Injury0\bin\Debug\GunshotWound.dll
+C:\RiderProjects\gunshotwound\Injury0\bin\Debug\GunshotWound.pdb
+C:\RiderProjects\gunshotwound\Injury0\bin\Debug\ScriptHookVDotNet2.dll
+C:\RiderProjects\gunshotwound\Injury0\bin\Debug\ScriptHookVDotNet2.xml
+C:\RiderProjects\gunshotwound\Injury0\obj\Debug\Injury0.csprojResolveAssemblyReference.cache
+C:\RiderProjects\gunshotwound\Injury0\obj\Debug\Injury0.csproj.CoreCompileInputs.cache
+C:\RiderProjects\gunshotwound\Injury0\obj\Debug\GunshotWound.dll
+C:\RiderProjects\gunshotwound\Injury0\obj\Debug\GunshotWound.pdb

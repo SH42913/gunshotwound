@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading.Tasks;
 using GTA;
 using GTA.Native;
 
@@ -75,7 +74,7 @@ namespace GunshotWound.WoundedPeds
                 if (_isPlayer) return;
 
                 TargetPed.Health =
-                    (int) (0.5f * ManagerScript.MaxHealth + rand.NextDouble() * ManagerScript.MaxHealth / 2);
+                    (int) (0.5f * ManagerScript.MaxHealth + Rand.NextDouble() * ManagerScript.MaxHealth / 2);
                 defaultAccuracy = TargetPed.Accuracy;
             }
         }
@@ -85,15 +84,14 @@ namespace GunshotWound.WoundedPeds
             get { return TargetPed.Gender == Gender.Male ? "He" : "She"; }
         }
 
-        private int currentArmor;
-
+        private int _currentArmor;
         private int CurrentArmor
         {
-            get { return currentArmor; }
+            get { return _currentArmor; }
             set
             {
-                currentArmor = value;
-                TargetPed.Armor = currentArmor;
+                _currentArmor = value;
+                TargetPed.Armor = _currentArmor;
             }
         }
 
@@ -241,26 +239,23 @@ namespace GunshotWound.WoundedPeds
         private int defaultAccuracy;
         private float onFireTimer;
         private float chockingTimer;
-        private readonly Random rand = new Random();
+        private static Random Rand { get; set; } = new Random();
 
-        private float foolsDayTimer = 600;
-
-        public async Task UpdateAsync()
-        {
-            await Task.Run(() => Update());
-        }
+        private float FoolsDayTimer { get; set; } = 600;
 
         public void Update()
         {
+            #region NothingToSeeHere
+
             if (ManagerScript.FoolsDay)
             {
-                foolsDayTimer -= Game.LastFrameTime;
-                if (foolsDayTimer < 0)
+                FoolsDayTimer -= Game.LastFrameTime;
+                if (FoolsDayTimer < 0)
                 {
-                    foolsDayTimer = rand.Next(300, 600);
-                    if (rand.NextDouble() > 0.8d)
+                    FoolsDayTimer = Rand.Next(300, 600);
+                    if (Rand.NextDouble() > 0.8d)
                     {
-                        int text = rand.Next(0, 4);
+                        int text = Rand.Next(0, 4);
                         switch (text)
                         {
                             case 0:
@@ -317,6 +312,8 @@ namespace GunshotWound.WoundedPeds
                     }
                 }
             }
+
+            #endregion
             
             if (IsPlayer)
             {
@@ -332,8 +329,8 @@ namespace GunshotWound.WoundedPeds
             }
             TargetPed.Armor = CurrentArmor;
                         
-            CheckDamage(ManagerScript.GetDamagedWeaponClass(TargetPed),
-                ManagerScript.GetDamagedBodyPart(TargetPed));
+            CheckDamage(GunshotWound.GetDamagedWeaponClass(TargetPed, ManagerScript.DebugMode),
+                GunshotWound.GetDamagedBodyPart(TargetPed, ManagerScript.DebugMode));
 
             BleedingHealing();
             WoundsHealingAndDeathTimer();
@@ -799,7 +796,7 @@ namespace GunshotWound.WoundedPeds
                 healthInfo += $"Time to healing B{(int)bleedingState} {bleedingHealTimer:0.0} " +
                               $"and W{(int)woundState} {woundHealTimer:0.0}\n";
                 healthInfo += $"Accuracy {TargetPed.Accuracy}\n";
-                healthInfo += $"Fool's Day Timer {foolsDayTimer:0.0}\n";
+                healthInfo += $"Fool's Day Timer {FoolsDayTimer:0.0}\n";
             }
 
             return healthInfo;
@@ -815,7 +812,7 @@ namespace GunshotWound.WoundedPeds
         {
             if (bleedingState == BleedingStates.LIGHT)
                 {
-                    int text = rand.Next(0, 4);
+                    int text = Rand.Next(0, 4);
                     switch (text)
                     {
                         case 0: UI.Notify("Some scratches"); break;
@@ -826,7 +823,7 @@ namespace GunshotWound.WoundedPeds
                 }
                 else if (bleedingState == BleedingStates.MEDIUM)
                 {
-                    int text = rand.Next(0, 4);
+                    int text = Rand.Next(0, 4);
                     switch (text)
                     {
                         case 0: UI.Notify("Moderate bleeding"); break;
@@ -837,7 +834,7 @@ namespace GunshotWound.WoundedPeds
                 }
                 else if(bleedingState == BleedingStates.HEAVY)
                 {
-                    int text = rand.Next(0, 4);
+                    int text = Rand.Next(0, 4);
                     switch (text)
                     {
                         case 0: UI.Notify("~y~Serious bleeding"); break;
@@ -848,7 +845,7 @@ namespace GunshotWound.WoundedPeds
                 }
                 else if (bleedingState == BleedingStates.DEADLY)
                 {
-                    int text = rand.Next(0, 4);
+                    int text = Rand.Next(0, 4);
                     switch (text)
                     {
                         case 0: UI.Notify("~r~Artery severed"); break;
@@ -899,7 +896,7 @@ namespace GunshotWound.WoundedPeds
                 
             if (woundState == WoundStates.LIGHT)
             {
-                int text = rand.Next(0, 4);
+                int text = Rand.Next(0, 4);
                 switch (text)
                 {
                     case 0: UI.Notify("Winded"); break;
@@ -910,7 +907,7 @@ namespace GunshotWound.WoundedPeds
             }    
             else if (woundState == WoundStates.MEDIUM)
             {
-                int text = rand.Next(0, 4);
+                int text = Rand.Next(0, 4);
                 switch (text)
                 {
                     case 0: UI.Notify("Moderate trauma detected"); break;
@@ -921,7 +918,7 @@ namespace GunshotWound.WoundedPeds
             }
             else if (woundState == WoundStates.HEAVY)
             {
-                int text = rand.Next(0, 3);
+                int text = Rand.Next(0, 3);
                 switch (text)
                 {
                     case 0: UI.Notify("~y~Life threatening condition detected"); break;
@@ -931,7 +928,7 @@ namespace GunshotWound.WoundedPeds
             }
             else if (woundState == WoundStates.DEADLY)
             {
-                int text = rand.Next(0, 2);
+                int text = Rand.Next(0, 2);
                 switch (text)
                 {
                     case 0: UI.Notify("~r~~bold~Death imminent"); break;
@@ -1021,6 +1018,8 @@ namespace GunshotWound.WoundedPeds
 
         private void CheckDamage(WeaponClasses weapon, BodyParts bone)
         {
+            if(bone == BodyParts.NOTHING) return;
+            
             switch (weapon)
             {
                 default:
@@ -1037,11 +1036,11 @@ namespace GunshotWound.WoundedPeds
                             return;
                         case BodyParts.HEAD:
                         {
-                            bool helmetSave = TargetPed.IsWearingHelmet && rand.Next(0, 2) == 1;
+                            bool helmetSave = TargetPed.IsWearingHelmet && Rand.TrueWithChance(0.8f);
 
                             if (!helmetSave)
                             {
-                                int situation = rand.Next(0, 8);
+                                int situation = Rand.Next(0, 8);
                                 string situationText = "";
 
                                 switch (situation)
@@ -1111,7 +1110,7 @@ namespace GunshotWound.WoundedPeds
                         }
                         case BodyParts.NECK:
                         {
-                            int situation = rand.Next(0, 7);
+                            int situation = Rand.Next(0, 7);
                             string situationText = "";
                             
                             switch (situation)
@@ -1158,7 +1157,7 @@ namespace GunshotWound.WoundedPeds
                         }
                         case BodyParts.UPPER_BODY:
                         {
-                            int situation = rand.Next(0, 6);
+                            int situation = Rand.Next(0, 6);
                             string situationText = "";
                             
                             switch (situation)
@@ -1201,7 +1200,7 @@ namespace GunshotWound.WoundedPeds
                         }
                         case BodyParts.LOWER_BODY:
                         {
-                            int situation = rand.Next(0, 7);
+                            int situation = Rand.Next(0, 7);
                             string situationText = "";
                             
                             switch (situation)
@@ -1250,7 +1249,7 @@ namespace GunshotWound.WoundedPeds
                         }
                         case BodyParts.ARM:
                         {
-                            int situation = rand.Next(0, 6);
+                            int situation = Rand.Next(0, 6);
                             string situationText = "";
                             
                             switch (situation)
@@ -1295,7 +1294,7 @@ namespace GunshotWound.WoundedPeds
                         }
                         case BodyParts.LEG:
                         {
-                            int situation = rand.Next(0, 6);
+                            int situation = Rand.Next(0, 6);
                             string situationText = "";
                             
                             switch (situation)
@@ -1350,11 +1349,11 @@ namespace GunshotWound.WoundedPeds
                             return;
                         case BodyParts.HEAD:
                         {
-                            bool helmetSave = TargetPed.IsWearingHelmet && rand.Next(0, 2) == 1;
+                            bool helmetSave = TargetPed.IsWearingHelmet && Rand.TrueWithChance(0.6f);
 
                             if (!helmetSave)
                             {
-                                int situation = rand.Next(0, 5);
+                                int situation = Rand.Next(0, 5);
                                 string situationText = "";
                                 
                                 switch (situation)
@@ -1396,15 +1395,15 @@ namespace GunshotWound.WoundedPeds
                             }
                             else
                             {
-                                if (IsPlayer && ManagerScript.TimeToRefreshNotifications > 0 && TargetPed.IsWearingHelmet)
-                                    UI.Notify("You are lucky! Bullet stuck in helmet!");
+                                if (IsPlayer && ManagerScript.TimeToRefreshNotifications > 0)
+                                    UI.Notify("You are lucky! Small caliber stuck in helmet!");
                             }
                             
                             return;
                         }
                         case BodyParts.NECK:
                         {
-                            int situation = rand.Next(0, 6);
+                            int situation = Rand.Next(0, 6);
                             string situationText = "";
                             
                             switch (situation)
@@ -1455,7 +1454,7 @@ namespace GunshotWound.WoundedPeds
                             if (CurrentArmor < ManagerScript.ArmorDamage)
                             {
                                 string situationText = "";
-                                int situation = rand.Next(0, 9);
+                                int situation = Rand.Next(0, 9);
                                 
                                 switch (situation)
                                 {
@@ -1526,7 +1525,7 @@ namespace GunshotWound.WoundedPeds
                             if (CurrentArmor < ManagerScript.ArmorDamage)
                             {
                                 string situationText = "";
-                                int situation = rand.Next(0, 10);
+                                int situation = Rand.Next(0, 10);
                                 
                                 switch (situation)
                                 {
@@ -1602,7 +1601,7 @@ namespace GunshotWound.WoundedPeds
                         }
                         case BodyParts.ARM:
                         {
-                            int situation = rand.Next(0, 7);
+                            int situation = Rand.Next(0, 7);
                             string situationText = "";
                             
                             switch (situation)
@@ -1658,7 +1657,7 @@ namespace GunshotWound.WoundedPeds
                         }
                         case BodyParts.LEG:
                         {
-                           int situation = rand.Next(0, 7);
+                           int situation = Rand.Next(0, 7);
                             string situationText = "";
                             
                             switch (situation)
@@ -1724,8 +1723,12 @@ namespace GunshotWound.WoundedPeds
                             return;
                         case BodyParts.HEAD:
                         {
-                            int situation = rand.Next(0, 5);
+                            bool helmetSave = TargetPed.IsWearingHelmet && Rand.TrueWithChance(0.2f);
                             string situationText = "";
+
+                            if (!helmetSave)
+                            {
+                                int situation = Rand.Next(0, 5);
                                 
                                 switch (situation)
                                 {
@@ -1759,14 +1762,20 @@ namespace GunshotWound.WoundedPeds
                                         TargetPed.Health -= ManagerScript.AdditionalHeadshotDamage;
                                         break;
                                 }
-    
-                                if(ManagerScript.DebugMode || IsPlayer && ManagerScript.TimeToRefreshNotifications > 0)
-                                    UI.Notify(situationText);
-                                return;
+                            }
+                            else
+                            {
+                                if (IsPlayer && ManagerScript.TimeToRefreshNotifications > 0)
+                                    UI.Notify("You are very lucky! Medium bullet stuck in helmet!");
+                            }
+                            
+                            if(ManagerScript.DebugMode || IsPlayer && ManagerScript.TimeToRefreshNotifications > 0)
+                                UI.Notify(situationText);
+                            return;
                         }
                         case BodyParts.NECK:
                         {
-                            int situation = rand.Next(0, 6);
+                            int situation = Rand.Next(0, 6);
                             string situationText = "";
                             
                             switch (situation)
@@ -1820,7 +1829,7 @@ namespace GunshotWound.WoundedPeds
                             if (CurrentArmor < ManagerScript.ArmorDamage)
                             {
                                 string situationText = "";
-                                int situation = rand.Next(0, 9);
+                                int situation = Rand.Next(0, 9);
                                 
                                 switch (situation)
                                 {
@@ -1891,7 +1900,7 @@ namespace GunshotWound.WoundedPeds
                             if (CurrentArmor < ManagerScript.ArmorDamage)
                             {
                                 string situationText = "";
-                                int situation = rand.Next(0, 10);
+                                int situation = Rand.Next(0, 10);
                                 
                                 switch (situation)
                                 {
@@ -1967,7 +1976,7 @@ namespace GunshotWound.WoundedPeds
                         }
                         case BodyParts.ARM:
                         {
-                            int situation = rand.Next(0, 7);
+                            int situation = Rand.Next(0, 7);
                             string situationText = "";
                             
                             switch (situation)
@@ -2024,7 +2033,7 @@ namespace GunshotWound.WoundedPeds
                         }
                         case BodyParts.LEG:
                         {
-                            int situation = rand.Next(0, 7);
+                            int situation = Rand.Next(0, 7);
                             string situationText = "";
                             
                             switch (situation)
@@ -2091,8 +2100,12 @@ namespace GunshotWound.WoundedPeds
                             return;
                         case BodyParts.HEAD:
                         {
-                            int situation = rand.Next(0, 4);
+                            bool helmetSave = TargetPed.IsWearingHelmet && Rand.TrueWithChance(0.05f);
                             string situationText = "";
+
+                            if (helmetSave)
+                            {
+                                int situation = Rand.Next(0, 4);
                                 
                                 switch (situation)
                                 {
@@ -2120,14 +2133,20 @@ namespace GunshotWound.WoundedPeds
                                         TargetPed.Health -= ManagerScript.AdditionalHeadshotDamage;
                                         break;
                                 }
-    
-                                if(ManagerScript.DebugMode || IsPlayer && ManagerScript.TimeToRefreshNotifications > 0)
-                                    UI.Notify(situationText);
-                                return;
+                            }
+                            else
+                            {
+                                if (IsPlayer && ManagerScript.TimeToRefreshNotifications > 0)
+                                    UI.Notify("You are impossibly lucky! High caliber bullet stuck in helmet!");
+                            }
+                            
+                            if(ManagerScript.DebugMode || IsPlayer && ManagerScript.TimeToRefreshNotifications > 0)
+                                UI.Notify(situationText);
+                            return;
                         }
                         case BodyParts.NECK:
                         {
-                            int situation = rand.Next(0, 5);
+                            int situation = Rand.Next(0, 5);
                             string situationText = "";
                             
                             switch (situation)
@@ -2171,7 +2190,7 @@ namespace GunshotWound.WoundedPeds
                             if (CurrentArmor < ManagerScript.ArmorDamage)
                             {
                                 string situationText = "";
-                                int situation = rand.Next(0, 8);
+                                int situation = Rand.Next(0, 8);
                                 
                                 switch (situation)
                                 {
@@ -2236,7 +2255,7 @@ namespace GunshotWound.WoundedPeds
                             if (CurrentArmor < ManagerScript.ArmorDamage)
                             {
                                 string situationText = "";
-                                int situation = rand.Next(0, 9);
+                                int situation = Rand.Next(0, 9);
                                 
                                 switch (situation)
                                 {
@@ -2306,7 +2325,7 @@ namespace GunshotWound.WoundedPeds
                         }
                         case BodyParts.ARM:
                         {
-                            int situation = rand.Next(0, 7);
+                            int situation = Rand.Next(0, 7);
                             string situationText = "";
                             
                             switch (situation)
@@ -2364,7 +2383,7 @@ namespace GunshotWound.WoundedPeds
                         }
                         case BodyParts.LEG:
                         {
-                            int situation = rand.Next(0, 7);
+                            int situation = Rand.Next(0, 7);
                             string situationText = "";
                             
                             switch (situation)
@@ -2432,7 +2451,7 @@ namespace GunshotWound.WoundedPeds
                             return;
                         case BodyParts.HEAD:
                         {
-                            int situation = rand.Next(0, 5);
+                            int situation = Rand.Next(0, 5);
                                 string situationText = "";
                                 
                                 switch (situation)
@@ -2474,7 +2493,7 @@ namespace GunshotWound.WoundedPeds
                         }
                         case BodyParts.NECK:
                         {
-                            int situation = rand.Next(0, 6);
+                            int situation = Rand.Next(0, 6);
                             string situationText = "";
                             
                             switch (situation)
@@ -2524,7 +2543,7 @@ namespace GunshotWound.WoundedPeds
                             if (CurrentArmor < ManagerScript.ArmorDamage)
                             {
                                 string situationText = "";
-                                int situation = rand.Next(0, 9);
+                                int situation = Rand.Next(0, 9);
                                 
                                 switch (situation)
                                 {
@@ -2595,7 +2614,7 @@ namespace GunshotWound.WoundedPeds
                             if (CurrentArmor < ManagerScript.ArmorDamage)
                             {
                                 string situationText = "";
-                                int situation = rand.Next(0, 10);
+                                int situation = Rand.Next(0, 10);
                                 
                                 switch (situation)
                                 {
@@ -2671,7 +2690,7 @@ namespace GunshotWound.WoundedPeds
                         }
                         case BodyParts.ARM:
                         {
-                            int situation = rand.Next(0, 7);
+                            int situation = Rand.Next(0, 7);
                             string situationText = "";
                             
                             switch (situation)
@@ -2727,7 +2746,7 @@ namespace GunshotWound.WoundedPeds
                         }
                         case BodyParts.LEG:
                         {
-                           int situation = rand.Next(0, 7);
+                           int situation = Rand.Next(0, 7);
                             string situationText = "";
                             
                             switch (situation)
@@ -2783,7 +2802,7 @@ namespace GunshotWound.WoundedPeds
                         }
                     }
                 }
-                case WeaponClasses.IMPACT:
+                case WeaponClasses.LIGHT_IMPACT:
                 {
                     switch (bone)
                     {
@@ -2793,11 +2812,235 @@ namespace GunshotWound.WoundedPeds
                             return;
                         case BodyParts.HEAD:
                         {
-                            bool helmetSave = TargetPed.IsWearingHelmet && rand.Next(0, 2) == 1;
+                            bool helmetSave = TargetPed.IsWearingHelmet && Rand.TrueWithChance(0.9f);
 
                             if (!helmetSave)
                             {
-                                int situation = rand.Next(0, 8);
+                                int situation = Rand.Next(0, 7);
+                                string situationText = "";
+
+                                switch (situation)
+                                {
+                                    case 0:
+                                        situationText = "Light bruising";
+                                        WoundState = WoundStates.LIGHT;
+                                        break;
+                                    case 1:
+                                        situationText = "Winded from impact";
+                                        if (IsPlayer)
+                                        {
+                                            Function.Call(Hash._SET_CAM_EFFECT, 1);
+                                        }
+                                        WoundState = WoundStates.LIGHT;
+                                        break;
+                                    case 2:
+                                        situationText = "Your nose was broken";
+                                        BleedingState = BleedingStates.MEDIUM;
+                                        WoundState = WoundStates.LIGHT;
+                                        break;
+                                    case 3:
+                                        situationText = "Some scratches";
+                                        BleedingState = BleedingStates.LIGHT;
+                                        break;
+                                    case 4:
+                                        situationText = "Medium bruising";
+                                        WoundState = WoundStates.MEDIUM;
+                                        break;
+                                    case 5:
+                                        situationText = "Dazed from blow";
+                                        if (IsPlayer)
+                                        {
+                                            Function.Call(Hash._SET_CAM_EFFECT, 1);
+                                        }
+                                        WoundState = WoundStates.MEDIUM;
+                                        break;
+                                    case 6:
+                                        situationText = "Blackout possible";
+                                        WoundState = WoundStates.HEAVY;
+                                        break;
+                                }
+
+                                if (ManagerScript.DebugMode || IsPlayer && ManagerScript.TimeToRefreshNotifications > 0)
+                                    UI.Notify(situationText);
+                            }
+                            else
+                            {
+                                if (IsPlayer && ManagerScript.TimeToRefreshNotifications > 0)
+                                    UI.Notify("Helmet saves your head!");
+                            }
+
+                            return;
+                        }
+                        case BodyParts.NECK:
+                        {
+                            int situation = Rand.Next(0, 3);
+                            string situationText = "";
+                            
+                            switch (situation)
+                            {
+                                    case 0:
+                                        situationText = "Light bruising";
+                                        WoundState = WoundStates.LIGHT;
+                                        break;
+                                    case 1:
+                                        situationText = "Some scratches";
+                                        BleedingState = BleedingStates.LIGHT;
+                                        break;
+                                    case 2:
+                                        situationText = "Medium bruising";
+                                        WoundState = WoundStates.MEDIUM;
+                                        break;
+                            }
+
+                            if(ManagerScript.DebugMode || IsPlayer && ManagerScript.TimeToRefreshNotifications > 0)
+                                UI.Notify(situationText);
+                            return;
+                        }
+                        case BodyParts.UPPER_BODY:
+                        {
+                            if (TargetPed.Armor > 0.1f * ManagerScript.MaxArmor) return;
+
+                            int situation = Rand.Next(0, 3);
+                            string situationText = "";
+                            
+                            switch (situation)
+                            {
+                                case 0:
+                                    situationText = "Light bruising";
+                                    WoundState = WoundStates.LIGHT;
+                                    break;
+                                case 1:
+                                    situationText = "Some scratches";
+                                    BleedingState = BleedingStates.LIGHT;
+                                    break;
+                                case 2:
+                                    situationText = "Medium bruising";
+                                    WoundState = WoundStates.MEDIUM;
+                                    break;
+                            }
+    
+                            if(ManagerScript.DebugMode || IsPlayer && ManagerScript.TimeToRefreshNotifications > 0)
+                                UI.Notify(situationText);
+
+                            return;
+                        }
+                        case BodyParts.LOWER_BODY:
+                        {
+                            if (TargetPed.Armor > 0.1f * ManagerScript.MaxArmor) return;
+                            
+                            int situation = Rand.Next(0, 3);
+                            string situationText = "";
+                            
+                            switch (situation)
+                            {
+                                case 0:
+                                    situationText = "Light bruising";
+                                    WoundState = WoundStates.LIGHT;
+                                    break;
+                                case 1:
+                                    situationText = "Some scratches";
+                                    BleedingState = BleedingStates.LIGHT;
+                                    break;
+                                case 2:
+                                    situationText = "Medium bruising";
+                                    WoundState = WoundStates.MEDIUM;
+                                    break;
+                            }
+    
+                            if(ManagerScript.DebugMode || IsPlayer && ManagerScript.TimeToRefreshNotifications > 0)
+                                UI.Notify(situationText);
+
+                            return;
+                        }
+                        case BodyParts.ARM:
+                        {
+                            int situation = Rand.Next(0, 5);
+                            string situationText = "";
+                            
+                            switch (situation)
+                            {
+                                case 0:
+                                    situationText = "Light bruising";
+                                    WoundState = WoundStates.LIGHT;
+                                    break;
+                                case 1:
+                                    situationText = "Some scratches";
+                                    BleedingState = BleedingStates.LIGHT;
+                                    break;
+                                case 2:
+                                    situationText = "Medium bruising";
+                                    WoundState = WoundStates.MEDIUM;
+                                    break;
+                                case 3:
+                                    situationText = "Bruised or fractured pinky finger";
+                                    BleedingState = BleedingStates.LIGHT;
+                                    WoundState = WoundStates.LIGHT;
+                                    break;
+                                case 4:
+                                    situationText = "Small-joint strain detected";
+                                    BleedingState = BleedingStates.LIGHT;
+                                    WoundState = WoundStates.MEDIUM;
+                                    AddDamageFlag(DamageTypes.ARMS_DAMAGED);
+                                    break;
+                            }
+
+                            if(ManagerScript.DebugMode || IsPlayer && ManagerScript.TimeToRefreshNotifications > 0)
+                                UI.Notify(situationText);
+                            return;
+                        }
+                        case BodyParts.LEG:
+                        {
+                            int situation = Rand.Next(0, 5);
+                            string situationText = "";
+                            
+                            switch (situation)
+                            {
+                                case 0:
+                                    situationText = "Light bruising";
+                                    WoundState = WoundStates.LIGHT;
+                                    break;
+                                case 1:
+                                    situationText = "Some scratches";
+                                    BleedingState = BleedingStates.LIGHT;
+                                    break;
+                                case 2:
+                                    situationText = "Medium bruising";
+                                    WoundState = WoundStates.MEDIUM;
+                                    break;
+                                case 3:
+                                    situationText = "Bruised or fractured pinky finger";
+                                    BleedingState = BleedingStates.LIGHT;
+                                    WoundState = WoundStates.LIGHT;
+                                    break;
+                                case 4:
+                                    situationText = "Small-joint strain detected";
+                                    BleedingState = BleedingStates.LIGHT;
+                                    WoundState = WoundStates.MEDIUM;
+                                    AddDamageFlag(DamageTypes.LEGS_DAMAGED);
+                                    break;
+                            }
+
+                            if(ManagerScript.DebugMode || IsPlayer && ManagerScript.TimeToRefreshNotifications > 0)
+                                UI.Notify(situationText);
+                            return;
+                        }
+                    }
+                }
+                case WeaponClasses.HEAVY_IMPACT:
+                {
+                    switch (bone)
+                    {
+                        default:
+                            return;
+                        case BodyParts.NOTHING:
+                            return;
+                        case BodyParts.HEAD:
+                        {
+                            bool helmetSave = TargetPed.IsWearingHelmet && Rand.TrueWithChance();
+
+                            if (!helmetSave)
+                            {
+                                int situation = Rand.Next(0, 8);
                                 string situationText = "";
 
                                 switch (situation)
@@ -2866,7 +3109,7 @@ namespace GunshotWound.WoundedPeds
                         }
                         case BodyParts.NECK:
                         {
-                            int situation = rand.Next(0, 5);
+                            int situation = Rand.Next(0, 5);
                             string situationText = "";
                             
                             switch (situation)
@@ -2897,94 +3140,92 @@ namespace GunshotWound.WoundedPeds
                         }
                         case BodyParts.UPPER_BODY:
                         {
-                            if (TargetPed.Armor < 1)
-                            {
-                                int situation = rand.Next(0, 6);
-                                string situationText = "";
-                                
-                                switch (situation)
-                                {
-                                    case 0:
-                                        situationText = "Light bruise";
-                                        BleedingState = BleedingStates.LIGHT;
-                                        WoundState = WoundStates.LIGHT;
-                                        break;
-                                    case 1:
-                                        situationText = "Moderate bruise";
-                                        WoundState = WoundStates.MEDIUM;
-                                        break;
-                                    case 2:
-                                        situationText = "Heavy bruise";
-                                        BleedingState = BleedingStates.MEDIUM;
-                                        WoundState = WoundStates.LIGHT;
-                                        break;
-                                    case 3:
-                                        situationText = "Some ribs are broken";
-                                        BleedingState = BleedingStates.MEDIUM;
-                                        WoundState = WoundStates.HEAVY;
-                                        break;
-                                    case 4:
-                                        situationText = "Lungs was punctured by broken ribs";
-                                        BleedingState = BleedingStates.HEAVY;
-                                        WoundState = WoundStates.HEAVY;
-                                        AddDamageFlag(DamageTypes.LUNGS_DAMAGED);
-                                        break;
-                                    case 5:
-                                        situationText = "Heartbreak";
-                                        BleedingState = BleedingStates.HEAVY;
-                                        WoundState = WoundStates.DEADLY;
-                                        AddDamageFlag(DamageTypes.HEART_DAMAGED);
-                                        break;
-                                }
-    
-                                if(ManagerScript.DebugMode || IsPlayer && ManagerScript.TimeToRefreshNotifications > 0)
-                                    UI.Notify(situationText);
-                            }
+                            if (TargetPed.Armor > 0.1f * ManagerScript.MaxArmor) return;
                             
+                            int situation = Rand.Next(0, 6);
+                            string situationText = "";
+                                
+                            switch (situation)
+                            {
+                                case 0:
+                                    situationText = "Light bruise";
+                                    BleedingState = BleedingStates.LIGHT;
+                                    WoundState = WoundStates.LIGHT;
+                                    break;
+                                case 1:
+                                    situationText = "Moderate bruise";
+                                    WoundState = WoundStates.MEDIUM;
+                                    break;
+                                case 2:
+                                    situationText = "Heavy bruise";
+                                    BleedingState = BleedingStates.MEDIUM;
+                                    WoundState = WoundStates.LIGHT;
+                                    break;
+                                case 3:
+                                    situationText = "Some ribs are broken";
+                                    BleedingState = BleedingStates.MEDIUM;
+                                    WoundState = WoundStates.HEAVY;
+                                    break;
+                                case 4:
+                                    situationText = "Lungs was punctured by broken ribs";
+                                    BleedingState = BleedingStates.HEAVY;
+                                    WoundState = WoundStates.HEAVY;
+                                    AddDamageFlag(DamageTypes.LUNGS_DAMAGED);
+                                    break;
+                                case 5:
+                                    situationText = "Heartbreak";
+                                    BleedingState = BleedingStates.HEAVY;
+                                    WoundState = WoundStates.DEADLY;
+                                    AddDamageFlag(DamageTypes.HEART_DAMAGED);
+                                    break;
+                            }
+    
+                            if(ManagerScript.DebugMode || IsPlayer && ManagerScript.TimeToRefreshNotifications > 0)
+                                UI.Notify(situationText);
+
                             return;
                         }
                         case BodyParts.LOWER_BODY:
                         {
-                            if (TargetPed.Armor < 1)
-                            {
-                                int situation = rand.Next(0, 5);
-                                string situationText = "";
-                                
-                                switch (situation)
-                                {
-                                    case 0:
-                                        situationText = "Light bruise";
-                                        BleedingState = BleedingStates.LIGHT;
-                                        WoundState = WoundStates.LIGHT;
-                                        break;
-                                    case 1:
-                                        situationText = "Moderate bruise";
-                                        WoundState = WoundStates.MEDIUM;
-                                        break;
-                                    case 2:
-                                        situationText = "Heavy bruise";
-                                        BleedingState = BleedingStates.MEDIUM;
-                                        WoundState = WoundStates.LIGHT;
-                                        break;
-                                    case 3:
-                                        situationText = "Stomach damaged";
-                                        WoundState = WoundStates.HEAVY;
-                                        break;
-                                    case 4:
-                                        situationText = "Guts damaged";
-                                        WoundState = WoundStates.HEAVY;
-                                        break;
-                                }
-    
-                                if(ManagerScript.DebugMode || IsPlayer && ManagerScript.TimeToRefreshNotifications > 0)
-                                    UI.Notify(situationText);
-                            }
+                            if (TargetPed.Armor > 0.1f * ManagerScript.MaxArmor) return;
                             
+                            int situation = Rand.Next(0, 5);
+                            string situationText = "";
+                                
+                            switch (situation)
+                            {
+                                case 0:
+                                    situationText = "Light bruise";
+                                    BleedingState = BleedingStates.LIGHT;
+                                    WoundState = WoundStates.LIGHT;
+                                    break;
+                                case 1:
+                                    situationText = "Moderate bruise";
+                                    WoundState = WoundStates.MEDIUM;
+                                    break;
+                                case 2:
+                                    situationText = "Heavy bruise";
+                                    BleedingState = BleedingStates.MEDIUM;
+                                    WoundState = WoundStates.LIGHT;
+                                    break;
+                                case 3:
+                                    situationText = "Stomach damaged";
+                                    WoundState = WoundStates.HEAVY;
+                                    break;
+                                case 4:
+                                    situationText = "Guts damaged";
+                                    WoundState = WoundStates.HEAVY;
+                                    break;
+                            }
+    
+                            if(ManagerScript.DebugMode || IsPlayer && ManagerScript.TimeToRefreshNotifications > 0)
+                                UI.Notify(situationText);
+
                             return;
                         }
                         case BodyParts.ARM:
                         {
-                            int situation = rand.Next(0, 6);
+                            int situation = Rand.Next(0, 6);
                             string situationText = "";
                             
                             switch (situation)
@@ -3028,7 +3269,7 @@ namespace GunshotWound.WoundedPeds
                         }
                         case BodyParts.LEG:
                         {
-                            int situation = rand.Next(0, 6);
+                            int situation = Rand.Next(0, 6);
                             string situationText = "";
                             
                             switch (situation)
@@ -3082,11 +3323,11 @@ namespace GunshotWound.WoundedPeds
                             return;
                         case BodyParts.HEAD:
                         {
-                            bool helmetSave = TargetPed.IsWearingHelmet && rand.Next(0, 2) == 1;
+                            bool helmetSave = TargetPed.IsWearingHelmet && Rand.TrueWithChance(0.6f);
 
                             if (!helmetSave)
                             {
-                                int situation = rand.Next(0, 5);
+                                int situation = Rand.Next(0, 5);
                                 string situationText = "";
                                 
                                 switch (situation)
@@ -3135,7 +3376,7 @@ namespace GunshotWound.WoundedPeds
                         }
                         case BodyParts.NECK:
                         {
-                            int situation = rand.Next(0, 6);
+                            int situation = Rand.Next(0, 6);
                             string situationText = "";
                             
                             switch (situation)
@@ -3185,7 +3426,7 @@ namespace GunshotWound.WoundedPeds
                             if (CurrentArmor < ManagerScript.ArmorDamage)
                             {
                                 string situationText = "";
-                                int situation = rand.Next(0, 8);
+                                int situation = Rand.Next(0, 8);
                                 
                                 switch (situation)
                                 {
@@ -3251,7 +3492,7 @@ namespace GunshotWound.WoundedPeds
                             if (CurrentArmor < ManagerScript.ArmorDamage)
                             {
                                 string situationText = "";
-                                int situation = rand.Next(0, 8);
+                                int situation = Rand.Next(0, 8);
                                 
                                 switch (situation)
                                 {
@@ -3314,7 +3555,7 @@ namespace GunshotWound.WoundedPeds
                         }
                         case BodyParts.ARM:
                         {
-                            int situation = rand.Next(0, 7);
+                            int situation = Rand.Next(0, 7);
                             string situationText = "";
                             
                             switch (situation)
@@ -3371,7 +3612,7 @@ namespace GunshotWound.WoundedPeds
                         }
                         case BodyParts.LEG:
                         {
-                            int situation = rand.Next(0, 6);
+                            int situation = Rand.Next(0, 6);
                             string situationText = "";
                             
                             switch (situation)
@@ -3568,7 +3809,7 @@ namespace GunshotWound.WoundedPeds
                     {
                         if (ManagerScript.EnemyNotificationsEnabled && !IsPlayer)
                         {
-                            UI.Notify(string.Format("{0} arm looks very bad", HeShe == "He" ? "His" : "Her"));
+                            UI.Notify($"{(HeShe == "He" ? "His" : "Her")} arm looks very bad");
                         }
                     }
                     return;
@@ -3584,7 +3825,7 @@ namespace GunshotWound.WoundedPeds
                     {
                         if (ManagerScript.EnemyNotificationsEnabled && !IsPlayer)
                         {
-                            UI.Notify(string.Format("{0} leg looks very bad", HeShe == "He" ? "His" : "Her"));
+                            UI.Notify($"{(HeShe == "He" ? "His" : "Her")} leg looks very bad");
                         }
                     }
                     return;
@@ -3664,8 +3905,6 @@ namespace GunshotWound.WoundedPeds
                         Function.Call(Hash.SET_FLASH, 0, 0, 100, 500, 100);
                     }
                     return;
-                default:
-                    break;
             }
         }
     }

@@ -35,7 +35,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ScriptHookVDotNet2, Version=2.10.6.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\..\..\Program Files (x86)\Steam\steamapps\common\Grand Theft Auto V\ScriptHookVDotNet2.dll</HintPath>
+      <HintPath>ScriptHookLib\ScriptHookVDotNet2.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -54,6 +54,11 @@
     <Compile Include="TestPeds\TestPedFactory.cs" />
     <Compile Include="WoundedPeds\WoundedPed.cs" />
     <Compile Include="WoundedPeds\WoundedPedFactory.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="GunshotWoundConfig.xml" />
+    <Content Include="ScriptHookLib\ScriptHookVDotNet2.dll" />
+    <Content Include="ScriptHookLib\ScriptHookVDotNet2.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

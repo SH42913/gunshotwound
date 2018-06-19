@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GunshotWoundMod>
+	<General>
+		<WoundedPlayerEnabled>true</WoundedPlayerEnabled>
+		<!-- Change it to FALSE, if you don't want player-ped influenced by script -->
+		
+		<DamageModifier>1.3</DamageModifier>
+		<!-- Damage modifier for player's weapons.
+		It will make gameplay more realistic and easy. Better not set more than 2.
+		Game default damage is 1,0. -->
+		
+		<MaximalHealth>90</MaximalHealth>
+		<!-- Better not set more than 100 -->
+		
+		<SelfHealingAmount>0.0</SelfHealingAmount>
+		<!-- Set to 0 if you don't wanna ped could heal himself up to 50% -->
+		
+		<MaximalArmor>80</MaximalArmor>
+		<!-- Better not set more than 100 -->
+		
+		<ArmorDamage>10</ArmorDamage>
+		<!-- 10 mean you will lose
+		10ArmorPoints on small caliber damage or cutting weapon
+		20AP on medium caliber
+		30AP on high caliber -->
+		
+		<RefreshNotificationsTime>10.0</RefreshNotificationsTime>
+		<!-- 10 mean every 10 seconds you will get status-notifications.
+		Set to 0 if you don't wanna see any notifications -->
+		
+		<OtherPedsNotifications>true</OtherPedsNotifications>
+		<!-- Show you notifications on critical damage of other peds.
+		Sure, only if you turn on Apply Script to Peds option -->
+		
+		<SubtitlesStatus>true</SubtitlesStatus>
+		<!-- Override subtitles to show information about ped state.
+		You also on/off SubStatus with Subtitles Hotkey -->
+		
+		<DeadlyWoundSlowMotion>true</DeadlyWoundSlowMotion>
+		<!-- Slow-motion on deadly wound.
+		Timescale depends on Health/MaximalHealth, where 0 health is 0.5 of default timescale -->
+	</General>
+	
+	<WoundedPeds>
+		<WoundedPedsEnabled>false</WoundedPedsEnabled>
+		<!-- It can strike on performance!!! Especially in big city, where a lot of people!
+		But if you sure in performance of your PC, change it to TRUE for more realistic gameplay.
+		Use it carefully, it also possibly can create troubles in mission, when you has friendly ped! -->
+		
+		<WorkingRadius>50.0</WorkingRadius>
+		<!-- 50 mean in sphere with radius 50 meters all human-peds will be influenced by script
+		and on 100(50*2) meters influence will lost.
+		Recommended 100 or more, but it can strike on performance! -->
+	</WoundedPeds>
+	
+	<BleedingInjuries>
+		<TimeToBleed>5.0</TimeToBleed>
+		<!-- 5 mean every 5 seconds ped will lose health.
+		On deadly bleeding time will halved -->
+		
+		<LightBleedingDamage>2</LightBleedingDamage>
+		<MediumBleedingDamage>4</MediumBleedingDamage>
+		<HeavyBleedingDamage>6</HeavyBleedingDamage>
+		<DeadlyBleedingDamage>8</DeadlyBleedingDamage>
+		<!-- Amount of health you will lose on bleeding -->
+		
+		<MaxBleedingLevel>3</MaxBleedingLevel>
+		<!-- Severity of bleeding injuries can increase.
+		3 mean that when you get 3 injuries same severity or 6 less severity, your bleeding state will increase -->
+		
+		<HealBleedingTime>20.0</HealBleedingTime>
+		<!-- 20 mean after 20 seconds bleeding state will decrease.
+		Time will multiply by bleeding level(2 for medium and 3 for heavy) -->
+	</BleedingInjuries>
+	
+	<Wounds>
+		<TimeToDeath>90.0</TimeToDeath>
+		<!-- When you got deadly wound, script start timer with time above.
+		90 mean after 90 seconds with deadly wound you will die.
+		But critical wounds(like punctured lungs) will decrease time to death.
+		With guts damage you will die 2 times quickly
+		With stomach damage you will die 2 times quickly
+		With lungs damage you will die 3 times quickly
+		With heart damage you will die 10 times quickly.
+		If Time to Death 90 you will die in 7.5 seconds with heart damage. -->
+		
+		<AdditionalDamageLightWound>2</AdditionalDamageLightWound>
+		<AdditionalDamageMediumWound>4</AdditionalDamageMediumWound>
+		<AdditionalDamageHeavyWound>8</AdditionalDamageHeavyWound>
+		<AdditionalDamageDeadlyWound>16</AdditionalDamageDeadlyWound>
+		<!-- This damage will apply to ped on wounds -->
+		
+		<AdditionalDamageNervesDamage>12</AdditionalDamageNervesDamage>
+		<!-- This damage will apply to ped on nerves damage -->
+		
+		<AdditionalDamageHeadshot>50</AdditionalDamageHeadshot>
+		<!-- This damage will apply to ped on headshots.
+		50 here and 16 in Deadly Wound mean you will lose 66 HP on headshot, 'cause headshot is deadly wound	-->
+		
+		
+		<MoveRateLightWound>0.98</MoveRateLightWound>
+		<MoveRateMediumWound>0.96</MoveRateMediumWound>
+		<MoveRateHeavyWound>0.94</MoveRateHeavyWound>
+		<MoveRateDeadlyWound>0.92</MoveRateDeadlyWound>
+		<MoveRateNervesLegsDamage>0.90</MoveRateNervesLegsDamage>
+		<!-- This speed of animation will apply to ped on wound or nerves/legs damage.
+		Non wounded speed - 1.0 -->
+		
+		<AnimationNoneWound>move_m@generic</AnimationNoneWound>
+		<AnimationLightWound>move_m@gangster@a</AnimationLightWound>
+		<AnimationMediumWound>move_m@drunk@moderatedrunk</AnimationMediumWound>
+		<AnimationHeavyWound>move_m@drunk@verydrunk</AnimationHeavyWound>
+		<AnimationDeadlyWound>move_m@injured</AnimationDeadlyWound>
+		<AnimationNervesLegsDamage>move_m@drunk@verydrunk</AnimationNervesLegsDamage>
+		<!-- This animation will apply to ped on wound or nerves/legs damage.
+		Be carefully! It will change animation for every influenced peds(WoundedPedsEnabled option), not only for player! -->
+		
+		<MaxWoundLevel>3</MaxWoundLevel>
+		<!-- Severity of wounds can increase.
+		3 mean that when you get 3 wound same severity or 6 less severity, your wounds state will increase -->
+		
+		<HealWoundTime>20.0</HealWoundTime>
+		<!-- 20 mean after 20 seconds wounds state will decrease.
+		Time will multiply by wound level(2 for medium and 3 for heavy) -->
+	</Wounds>
+	
+	<Hotkeys>
+		<SubtitlesKey>106</SubtitlesKey>
+		<!-- On/Off Subtitles Status.
+		Default: Multiply(*) on NumPad. -->
+		
+		<NotificationsKey>111</NotificationsKey>
+		<!-- Check Yourself. Show status-notifications one time, fine variant for realistic and not annoying gameplay.
+		Default: Divide(/) on NumPad. -->
+		
+		<HealKey>75</HealKey>
+		<!-- Totally heal player ped, but better call 911 or find medics.
+		Default: K on keyboard. -->
+		
+		<GetHelmetKey>74</GetHelmetKey>
+		<!-- Give to player ped motorbike helmet if you have $30.
+		Helmet can save your head from impacts and small caliber weapon.
+		If you have helmet, this hotkey will remove it.
+		Default: J on keyboard. -->
+	</Hotkeys>
+</GunshotWoundMod>
+
+<!-- FOR MODDERS
+;You can use my mod for getting damaged body parts and weapon it was deal.
+;For this you simply Reference to my mod and use static methods GetDamagedBodyPart and GetDamagedWeaponClass of GunshotWound class.
+;Its take two params: target Ped and bool debugNotifications(using UI.Notify).
+;And return part of my enums BodyPart and WeaponClass.
+;Also you can rearange weapon's list used for find WeaponClass as you want. I used uint hashes. https://puu.sh/zY045/87e1c5ca06.png -->
